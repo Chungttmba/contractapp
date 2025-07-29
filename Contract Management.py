@@ -214,11 +214,7 @@ if auth_status:
                     ws.add_image(xl_img, "F1")
 
         st.download_button(
-            label=f"📄 Tải báo cáo của {selected_kh_xuat}",
-            data=buffer_kh.getvalue(),
-            file_name=f"bao_cao_{selected_kh_xuat}.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+            
 
         st.subheader("📦 Xuất tất cả báo cáo theo từng khách hàng")
         if st.button("📁 Tải tất cả báo cáo"):
