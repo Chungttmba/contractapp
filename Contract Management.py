@@ -51,12 +51,19 @@ authenticator = stauth.Authenticate(
     "auth_token",
     cookie_expiry_days=1
 )
-name, auth_status, username = authenticator.login("🔐 Đăng nhập", location="main")
+auth_status = True
+name = "Admin"
+username = "admin"
 
-if auth_status:
-    authenticator.logout("🚪 Đăng xuất", "sidebar")
-    st.sidebar.success(f"✅ Xin chào, {name}")
-    st.title("📋 Quản lý Hợp đồng & Đơn hàng")
+# XÓA XÁC THỰC để xem giao diện
+st.sidebar.success(f"✅ Xin chào, {name}")
+st.title("📋 Quản lý Hợp đồng & Đơn hàng")
+
+with st.sidebar.expander("🏢 Thông tin doanh nghiệp"):
+    company_name = st.text_input("Tên doanh nghiệp", "Công ty TNHH ABC")
+    logo_file = st.file_uploader("Tải lên logo", type=["png", "jpg", "jpeg"])
+    if logo_file:
+        st.image(logo_file, use_column_width=True)
 
     with st.sidebar.expander("🏢 Thông tin doanh nghiệp"):
         company_name = st.text_input("Tên doanh nghiệp", "Công ty TNHH ABC")
@@ -208,10 +215,13 @@ if auth_status:
                     xl_img.height = 60
                     ws.add_image(xl_img, "F1")
         st.download_button(
-    
-
-st.subheader("📦 Xuất tất cả báo cáo theo từng khách hàng")
-if st.button("📁 Tải tất cả báo cáo"):
+    label=f"📄 Tải báo cáo của {selected_kh_xuat}",
+    data=buffer_kh.getvalue(),
+    file_name=f"bao_cao_{selected_kh_xuat}.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
+        st.subheader("📦 Xuất tất cả báo cáo theo từng khách hàng")
+        if st.button("📁 Tải tất cả báo cáo"):
             from zipfile import ZipFile
             zip_buffer = io.BytesIO()
             with ZipFile(zip_buffer, "w") as zip_file:
