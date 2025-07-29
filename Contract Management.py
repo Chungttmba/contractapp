@@ -184,6 +184,81 @@ if auth_status:
             st.plotly_chart(fig2, use_container_width=True)
 
         st.subheader("👥 Doanh thu theo khách hàng")
+
+        st.subheader("📤 Xuất báo cáo theo từng khách hàng")
+        selected_kh_xuat = st.selectbox("Chọn khách hàng để xuất báo cáo", sorted(df["Khách hàng"].dropna().unique()))
+        df_kh = df[df["Khách hàng"] == selected_kh_xuat]
+
+        buffer_kh = io.BytesIO()
+        with pd.ExcelWriter(buffer_kh, engine="openpyxl") as writer:
+            df_kh.to_excel(writer, index=False, sheet_name="Hợp đồng")
+            ws = writer.sheets["Hợp đồng"]
+
+            # Ghi thông tin doanh nghiệp
+            if company_name:
+                ws.insert_rows(0)
+                ws.cell(row=1, column=1).value = f"Doanh nghiệp: {company_name}"
+
+            # Thêm logo nếu có
+            if logo_file:
+                from openpyxl.drawing.image import Image as XLImage
+                from PIL import Image
+                import tempfile
+
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_img:
+                    img = Image.open(logo_file)
+                    img.save(tmp_img.name)
+                    xl_img = XLImage(tmp_img.name)
+                    xl_img.width = 150
+                    xl_img.height = 60
+                    ws.add_image(xl_img, "F1")
+
+        st.download_button(
+            label=f"📄 Tải báo cáo của {selected_kh_xuat}",
+            data=buffer_kh.getvalue(),
+            file_name=f"bao_cao_{selected_kh_xuat}.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+        st.subheader("📦 Xuất tất cả báo cáo theo từng khách hàng")
+        if st.button("📁 Tải tất cả báo cáo"):
+            from zipfile import ZipFile
+            zip_buffer = io.BytesIO()
+            with ZipFile(zip_buffer, "w") as zip_file:
+                for kh in df["Khách hàng"].dropna().unique():
+                    df_kh_all = df[df["Khách hàng"] == kh]
+                    temp_buffer = io.BytesIO()
+                    with pd.ExcelWriter(temp_buffer, engine="openpyxl") as writer:
+                        df_kh_all.to_excel(writer, index=False, sheet_name="Hợp đồng")
+                        ws = writer.sheets["Hợp đồng"]
+                        if company_name:
+                            ws.insert_rows(0)
+                            ws.cell(row=1, column=1).value = f"Doanh nghiệp: {company_name}"
+                        if logo_file:
+                            from openpyxl.drawing.image import Image as XLImage
+                            from PIL import Image
+                            import tempfile
+                            with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_img:
+                                img = Image.open(logo_file)
+                                img.save(tmp_img.name)
+                                xl_img = XLImage(tmp_img.name)
+                                xl_img.width = 150
+                                xl_img.height = 60
+                                ws.add_image(xl_img, "F1")
+                    zip_file.writestr(f"{kh}_hop_dong.xlsx", temp_buffer.getvalue())
+            st.download_button(
+                label="📦 Tải tất cả báo cáo khách hàng (ZIP)",
+                data=zip_buffer.getvalue(),
+                file_name="bao_cao_tat_ca_khach_hang.zip",
+                mime="application/zip"
+            )
+
+
+            label=f"📄 Tải báo cáo của {selected_kh_xuat}",
+            data=buffer_kh.getvalue(),
+            file_name=f"bao_cao_{selected_kh_xuat}.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
         kh_stat = df.groupby("Khách hàng")["Giá trị quyết toán"].sum().reset_index().sort_values(by="Giá trị quyết toán", ascending=False)
         fig3 = px.bar(kh_stat, x="Giá trị quyết toán", y="Khách hàng", orientation="h")
         st.plotly_chart(fig3, use_container_width=True)
