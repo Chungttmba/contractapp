@@ -57,7 +57,29 @@ if auth_status:
     st.sidebar.success(f"✅ Xin chào, {name}")
     st.title("📋 Quản lý Hợp đồng & Đơn hàng")
 
+    with st.sidebar.expander("🏢 Thông tin doanh nghiệp"):
+        company_name = st.text_input("Tên doanh nghiệp", "Công ty TNHH ABC")
+        logo_file = st.file_uploader("Tải lên logo", type=["png", "jpg", "jpeg"])
+        if logo_file:
+            st.image(logo_file, use_column_width=True)
+        st.markdown(f"**Tên doanh nghiệp:** {company_name}")
+
     df = load_from_google_sheets()
+
+    # Làm sạch dữ liệu ngày hóa đơn nếu có
+    if "Ngày hóa đơn" in df.columns:
+        df["Ngày hóa đơn"] = pd.to_datetime(df["Ngày hóa đơn"], errors="coerce")
+
+    # Tính toán các đợt thanh toán và giá trị còn lại nếu có cột Lịch sử thanh toán
+    if "Lịch sử thanh toán" in df.columns:
+        def parse_ltt(x):
+            if pd.isna(x) or not isinstance(x, str):
+                return 0
+            parts = x.split(";")
+            return sum([float(p.split("|")[1]) for p in parts if "|" in p])
+
+        df["Tổng đã thanh toán"] = df["Lịch sử thanh toán"].apply(parse_ltt)
+        df["Còn lại"] = df["Giá trị quyết toán"].fillna(0) - df["Tổng đã thanh toán"].fillna(0)
 
     if df.empty:
         st.info("Chưa có dữ liệu hợp đồng.")
@@ -69,6 +91,16 @@ if auth_status:
         df["Quý"] = df["Ngày ký"].dt.quarter
 
         st.subheader("📑 Danh sách hợp đồng")
+        col_filter1, col_filter2 = st.columns(2)
+        with col_filter1:
+            selected_kh = st.selectbox("👤 Lọc theo khách hàng", ["Tất cả"] + sorted(df["Khách hàng"].dropna().unique()))
+        with col_filter2:
+            selected_invoice = st.selectbox("🧾 Lọc theo trạng thái hóa đơn", ["Tất cả"] + sorted(df["Trạng thái hóa đơn"].dropna().unique()))
+
+        if selected_kh != "Tất cả":
+            df = df[df["Khách hàng"] == selected_kh]
+        if selected_invoice != "Tất cả":
+            df = df[df["Trạng thái hóa đơn"] == selected_invoice]
         year_options = ["Tất cả"] + sorted(df["Năm"].dropna().unique().astype(int).tolist())
         selected_year = st.selectbox("📆 Lọc theo năm", year_options)
 
@@ -96,7 +128,31 @@ if auth_status:
         st.plotly_chart(fig3, use_container_width=True)
 
         buffer = io.BytesIO()
-        kh_stat.to_excel(buffer, index=False)
+        with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
+            kh_stat.to_excel(writer, index=False, sheet_name="Thống kê")
+            ws = writer.sheets["Thống kê"]
+
+            # Ghi thông tin doanh nghiệp ở dòng đầu tiên nếu có tên
+            if company_name:
+                ws.insert_rows(0)
+                ws.cell(row=1, column=1).value = f"Doanh nghiệp: {company_name}"
+
+            # Thêm logo nếu có
+            if logo_file:
+                from openpyxl.drawing.image import Image as XLImage
+                from PIL import Image
+                import tempfile
+
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_img:
+                    img = Image.open(logo_file)
+                    img.save(tmp_img.name)
+                    xl_img = XLImage(tmp_img.name)
+                    xl_img.width = 150
+                    xl_img.height = 60
+                    ws.add_image(xl_img, "F1")
+                ws.insert_rows(0)
+                ws.cell(row=1, column=1).value = f"Doanh nghiệp: {company_name}"
+
         st.download_button(
             label="📥 Tải thống kê theo khách hàng",
             data=buffer.getvalue(),
