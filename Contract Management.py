@@ -44,7 +44,7 @@ def load_users():
         "usernames": {
             "admin": {
                 "name": "Admin",
-                "password": stauth.Hasher(["123456"]).generate()[0]
+                "password": "$2b$12$KIXt87YOD41xZtMdpo97fOVJrNOxZbDTRZKFa6xB6KOe4a6DFi2lW"  # hash của '123456'
             }
         }
     }
