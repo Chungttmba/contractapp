@@ -64,7 +64,8 @@ with st.sidebar.expander("🏢 Thông tin doanh nghiệp"):
     logo_file = st.file_uploader("Tải lên logo", type=["png", "jpg", "jpeg"])
     if logo_file:
         st.image(logo_file, use_column_width=True)
-    st.markdown(f"**Tên doanh nghiệp:** {company_name}")
+
+st.markdown(f"**Tên doanh nghiệp:** {company_name}")
 
     df = load_from_google_sheets()
 
@@ -283,7 +284,7 @@ with st.sidebar.expander("🏢 Thông tin doanh nghiệp"):
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
-# elif auth_status is False:
-  #  st.error("❌ Sai tên đăng nhập hoặc mật khẩu")
-# elif auth_status is None:
-  #  st.warning("🔒 Vui lòng đăng nhập để tiếp tục")
+#elif auth_status is False:
+ #   st.error("❌ Sai tên đăng nhập hoặc mật khẩu")
+#elif auth_status is None:
+ #   st.warning("🔒 Vui lòng đăng nhập để tiếp tục")
