@@ -45,12 +45,6 @@ def load_users():
             }
         }
     }
-    return {
-        "usernames": {
-            "admin": {
-                "name": "Admin",
-                "password": "$2b$12$KIXt87YOD41xZtMdpo97fOVJrNOxZbDTRZKFa6xB6KOe4a6DFi2lW"  # hash của '123456'
-            }
         }
     }
 
