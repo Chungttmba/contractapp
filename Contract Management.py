@@ -289,7 +289,8 @@ with st.sidebar.expander("🏢 Thông tin doanh nghiệp"):
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
-elif auth_status is False:
-    st.error("❌ Sai tên đăng nhập hoặc mật khẩu")
-elif auth_status is None:
-    st.warning("🔒 Vui lòng đăng nhập để tiếp tục")
+
+ #//elif auth_status is False:
+#   // st.error("❌ Sai tên đăng nhập hoặc mật khẩu")
+#//elif auth_status is None:
+ # //  st.warning("🔒 Vui lòng đăng nhập để tiếp tục")
