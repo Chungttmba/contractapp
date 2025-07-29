@@ -67,5 +67,3 @@ elif auth_status is False:
 
 elif auth_status is None:
     st.warning("🔒 Vui lòng đăng nhập để tiếp tục")
-        }
-    }
