@@ -208,11 +208,7 @@ if auth_status:
                     xl_img.height = 60
                     ws.add_image(xl_img, "F1")
         st.download_button(
-    label=f"📄 Tải báo cáo của {selected_kh_xuat}",
-    data=buffer_kh.getvalue(),
-    file_name=f"bao_cao_{selected_kh_xuat}.xlsx",
-    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-)
+    
 
 st.subheader("📦 Xuất tất cả báo cáo theo từng khách hàng")
 if st.button("📁 Tải tất cả báo cáo"):
@@ -246,13 +242,6 @@ if st.button("📁 Tải tất cả báo cáo"):
                 file_name="bao_cao_tat_ca_khach_hang.zip",
                 mime="application/zip"
             )
-
-
-            label=f"📄 Tải báo cáo của {selected_kh_xuat}",
-            data=buffer_kh.getvalue(),
-            file_name=f"bao_cao_{selected_kh_xuat}.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
         kh_stat = df.groupby("Khách hàng")["Giá trị quyết toán"].sum().reset_index().sort_values(by="Giá trị quyết toán", ascending=False)
         fig3 = px.bar(kh_stat, x="Giá trị quyết toán", y="Khách hàng", orientation="h")
         st.plotly_chart(fig3, use_container_width=True)
