@@ -208,8 +208,13 @@ if auth_status:
                     xl_img.height = 60
                     ws.add_image(xl_img, "F1")
         st.download_button(
-            
-        st.subheader("📦 Xuất tất cả báo cáo theo từng khách hàng")
+    label=f"📄 Tải báo cáo của {selected_kh_xuat}",
+    data=buffer_kh.getvalue(),
+    file_name=f"bao_cao_{selected_kh_xuat}.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
+
+st.subheader("📦 Xuất tất cả báo cáo theo từng khách hàng")
         if st.button("📁 Tải tất cả báo cáo"):
             from zipfile import ZipFile
             zip_buffer = io.BytesIO()
