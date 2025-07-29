@@ -33,7 +33,8 @@ def load_from_google_sheets():
 
 # === User Authentication ===
 def load_users():
-    hashed_passwords = stauth.Hasher(['123456']).generate()
+    # Sử dụng mật khẩu đã hash sẵn cho '123456'
+hashed_passwords = ["$2b$12$KIXt87YOD41xZtMdpo97fOVJrNOxZbDTRZKFa6xB6KOe4a6DFi2lW"]
     return {
         "usernames": {
             "admin": {
@@ -95,7 +96,11 @@ if auth_status:
         with col_filter1:
             selected_kh = st.selectbox("👤 Lọc theo khách hàng", ["Tất cả"] + sorted(df["Khách hàng"].dropna().unique()))
         with col_filter2:
-            selected_invoice = st.selectbox("🧾 Lọc theo trạng thái hóa đơn", ["Tất cả"] + sorted(df["Trạng thái hóa đơn"].dropna().unique()))
+            if "Trạng thái hóa đơn" in df.columns:
+            invoice_options = ["Tất cả"] + sorted(df["Trạng thái hóa đơn"].dropna().unique())
+            selected_invoice = st.selectbox("🧾 Lọc theo trạng thái hóa đơn", invoice_options)
+            if selected_invoice != "Tất cả":
+                df = df[df["Trạng thái hóa đơn"] == selected_invoice]
 
         if selected_kh != "Tất cả":
             df = df[df["Khách hàng"] == selected_kh]
