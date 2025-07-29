@@ -80,7 +80,7 @@ def save_contracts(df):
 # === Xác thực người dùng ===
 credentials = load_users()
 authenticator = stauth.Authenticate(credentials, "contract_app", "auth_token", cookie_expiry_days=1)
-name, auth_status, username = authenticator.login("🔐 Đăng nhập", "main")
+name, auth_status, username = authenticator.login("🔐 Đăng nhập", location="main")
 
 if auth_status:
     authenticator.logout("🚪 Đăng xuất", "sidebar")
