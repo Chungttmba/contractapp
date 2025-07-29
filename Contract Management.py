@@ -131,6 +131,22 @@ if auth_status:
             if col not in df.columns:
                 df[col] = None
         st.dataframe(df[display_cols], use_container_width=True)
+
+        # Chỉnh sửa hợp đồng theo mã
+        st.subheader("✏️ Cập nhật thanh toán và giá trị quyết toán")
+        selected_hd = st.selectbox("Chọn hợp đồng để chỉnh sửa", df["Mã hợp đồng"].dropna().unique())
+        if selected_hd:
+            row = df[df["Mã hợp đồng"] == selected_hd].iloc[0]
+            with st.form("form_sua_hd"):
+                gt_moi = st.number_input("Cập nhật giá trị quyết toán", value=float(row["Giá trị quyết toán"]))
+                lich_su_moi = st.text_area("Cập nhật lịch sử thanh toán", value=row.get("Lịch sử thanh toán", ""),
+                                          help="Nhập dạng: Ngày|Giá trị;Ngày|Giá trị")
+                submit_sua = st.form_submit_button("💾 Cập nhật")
+                if submit_sua:
+                    df.loc[df["Mã hợp đồng"] == selected_hd, "Giá trị quyết toán"] = gt_moi
+                    df.loc[df["Mã hợp đồng"] == selected_hd, "Lịch sử thanh toán"] = lich_su_moi
+                    save_to_google_sheets(df)
+                    st.success("✅ Đã cập nhật hợp đồng!")
         col_filter1, col_filter2 = st.columns(2)
         with col_filter1:
             selected_kh = st.selectbox("👤 Lọc theo khách hàng", ["Tất cả"] + sorted(df["Khách hàng"].dropna().unique()))
