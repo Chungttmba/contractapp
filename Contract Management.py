@@ -82,6 +82,35 @@ if auth_status:
         df["Tổng đã thanh toán"] = df["Lịch sử thanh toán"].apply(parse_ltt)
         df["Còn lại"] = df["Giá trị quyết toán"].fillna(0) - df["Tổng đã thanh toán"].fillna(0)
 
+    if st.button("➕ Thêm hợp đồng mới"):
+        with st.form("form_them_hop_dong", clear_on_submit=True):
+            st.subheader("📝 Nhập thông tin hợp đồng mới")
+            ma_hd = st.text_input("Mã hợp đồng")
+            khach_hang = st.text_input("Khách hàng")
+            ngay_ky = st.date_input("Ngày ký")
+            gt_quyet_toan = st.number_input("Giá trị quyết toán", min_value=0.0, step=100000.0)
+            trang_thai_hd = st.selectbox("Trạng thái hợp đồng", ["Đang thực hiện", "Hoàn thành", "Hủy"])
+            trang_thai_hdong = st.selectbox("Trạng thái hóa đơn", ["Chưa xuất", "Đã xuất"])
+            so_hoa_don = st.text_input("Số hóa đơn")
+            ngay_hoa_don = st.date_input("Ngày hóa đơn") if trang_thai_hdong == "Đã xuất" else ""
+            lich_su_tt = st.text_area("Lịch sử thanh toán", help="Nhập dạng: Ngày|Giá trị;Ngày|Giá trị")
+            submitted = st.form_submit_button("Lưu hợp đồng")
+            if submitted:
+                new_row = {
+                    "Mã hợp đồng": ma_hd,
+                    "Khách hàng": khach_hang,
+                    "Ngày ký": ngay_ky.strftime("%Y-%m-%d"),
+                    "Giá trị quyết toán": gt_quyet_toan,
+                    "Trạng thái hợp đồng": trang_thai_hd,
+                    "Trạng thái hóa đơn": trang_thai_hdong,
+                    "Số hóa đơn": so_hoa_don,
+                    "Ngày hóa đơn": ngay_hoa_don.strftime("%Y-%m-%d") if ngay_hoa_don else "",
+                    "Lịch sử thanh toán": lich_su_tt
+                }
+                df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+                save_to_google_sheets(df)
+                st.success("✅ Hợp đồng mới đã được lưu!")
+
     if df.empty:
         st.info("Chưa có dữ liệu hợp đồng.")
     else:
@@ -92,6 +121,16 @@ if auth_status:
         df["Quý"] = df["Ngày ký"].dt.quarter
 
         st.subheader("📑 Danh sách hợp đồng")
+        # Hiển thị thêm cột trạng thái hợp đồng, trạng thái hóa đơn, tổng đã thanh toán, còn lại
+        display_cols = [
+            "Mã hợp đồng", "Khách hàng", "Ngày ký", "Giá trị quyết toán",
+            "Trạng thái hợp đồng", "Trạng thái hóa đơn", "Ngày hóa đơn", "Số hóa đơn",
+            "Tổng đã thanh toán", "Còn lại"
+        ]
+        for col in display_cols:
+            if col not in df.columns:
+                df[col] = None
+        st.dataframe(df[display_cols], use_container_width=True)
         col_filter1, col_filter2 = st.columns(2)
         with col_filter1:
             selected_kh = st.selectbox("👤 Lọc theo khách hàng", ["Tất cả"] + sorted(df["Khách hàng"].dropna().unique()))
