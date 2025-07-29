@@ -37,9 +37,14 @@ def load_from_google_sheets():
 
 # === Quản lý user ===
 def load_users():
-    if os.path.exists(USERS_FILE):
-        with open(USERS_FILE, "r") as f:
-            return json.load(f)
+    return {
+        "usernames": {
+            "admin": {
+                "name": "Admin",
+                "password": "$2b$12$KIXt87YOD41xZtMdpo97fOVJrNOxZbDTRZKFa6xB6KOe4a6DFi2lW"  # hash của '123456'
+            }
+        }
+    }
     return {
         "usernames": {
             "admin": {
