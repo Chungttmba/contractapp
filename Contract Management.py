@@ -101,8 +101,7 @@ if auth_status:
                 invoice_options = ["Tất cả"] + sorted(df["Trạng thái hóa đơn"].dropna().unique())
                 selected_invoice = st.selectbox("🧾 Lọc theo trạng thái hóa đơn", invoice_options)
                 if selected_invoice != "Tất cả":
-                    df = df[df["Trạng thái hóa đơn"] == selected_invoice]"Tất cả":
-                df = df[df["Trạng thái hóa đơn"] == selected_invoice]
+                    df = df[df["Trạng thái hóa đơn"] == selected_invoice]
 
         if selected_kh != "Tất cả":
             df = df[df["Khách hàng"] == selected_kh]
