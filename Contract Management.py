@@ -215,7 +215,7 @@ if auth_status:
 )
 
 st.subheader("📦 Xuất tất cả báo cáo theo từng khách hàng")
-        if st.button("📁 Tải tất cả báo cáo"):
+if st.button("📁 Tải tất cả báo cáo"):
             from zipfile import ZipFile
             zip_buffer = io.BytesIO()
             with ZipFile(zip_buffer, "w") as zip_file:
