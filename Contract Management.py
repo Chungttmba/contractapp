@@ -45,8 +45,6 @@ def load_users():
             }
         }
     }
-        }
-    }
 
 def save_users(data):
     with open(USERS_FILE, "w") as f:
